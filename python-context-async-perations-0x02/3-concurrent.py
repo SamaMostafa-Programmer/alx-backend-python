@@ -67,6 +67,11 @@ async def fetch_concurrently():
     for name, age in older_users_task:
         print(f" - {name}, Age: {age}")
 
+all_users_task, older_users_task = await asyncio.gather(
+    asyncfetchusers(db),
+    asyncfetcholder_users(db)
+)
+
 if __name__ == "__main__":
     # Must setup the database before reading from it
     asyncio.run(setup_database())
