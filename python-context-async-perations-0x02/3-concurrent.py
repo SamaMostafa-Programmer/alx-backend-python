@@ -18,7 +18,8 @@ async def setup_database():
         await db.commit()
         print("Database setup complete.")
 
-async def asyncfetchusers(db):
+
+async def async_fetch_users(db):
     """
     Fetches all users from the database.
     """
@@ -30,7 +31,7 @@ async def asyncfetchusers(db):
     return results
 
 
-async def asyncfetcholder_users(db, age_limit=40):
+async def async_fetch_older_users(db, age_limit=40):
     """
     Fetches users older than the specified age limit.
     """
@@ -49,10 +50,9 @@ async def fetch_concurrently():
     print("\n--- Starting Concurrent Fetching ---")
     
     async with aiosqlite.connect(DB_NAME) as db:
-        # ✅ Call the correct snake_case functions
         all_users_task, older_users_task = await asyncio.gather(
-            asyncfetchusers(db),
-            asyncfetcholder_users(db)
+            async_fetch_users(db),
+            async_fetch_older_users(db)
         )
 
     print("\n--- Results ---")
