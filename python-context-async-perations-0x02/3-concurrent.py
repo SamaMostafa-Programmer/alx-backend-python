@@ -32,7 +32,7 @@ async def async_fetch_users(db):
     return results
 
 
-async def async_fetch_older_users(db, age_limit=40):
+async def asyncfetcholder_users(db, age_limit=40):
     """
     Fetches users older than the specified age limit.
     """
@@ -54,7 +54,7 @@ async def fetch_concurrently():
         # ✅ Call the correct snake_case functions
         all_users_task, older_users_task = await asyncio.gather(
             async_fetch_users(db),
-            async_fetch_older_users(db)
+            asyncfetcholder_users(db)
         )
 
     print("\n--- Results ---")
