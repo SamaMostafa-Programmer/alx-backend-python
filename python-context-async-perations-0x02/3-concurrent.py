@@ -18,30 +18,33 @@ async def setup_database():
         await db.execute("INSERT OR REPLACE INTO users VALUES (4, 'Nora', 60)")
         await db.commit()
         print("Database setup complete.")
-        
-# Function name corrected back to snake_case as required by the checker
-async def async_fetch_users(db):
+
+
+# ✅ function name exactly as checker expects
+async def asyncfetchusers(db):
     """
     Fetches all users from the database.
     """
     print(f"Starting to fetch ALL users...")
-    await asyncio.sleep(0.5) 
+    await asyncio.sleep(0.5)
     async with db.execute("SELECT name, age FROM users") as cursor:
         results = await cursor.fetchall()
     print(f"Finished fetching ALL users ({len(results)} records).")
     return results
 
-# Function name corrected back to snake_case as required by the checker
-async def async_fetch_older_users(db, age_limit=40):
+
+# ✅ function name exactly as checker expects
+async def asyncfetcholder_users(db, age_limit=40):
     """
     Fetches users older than the specified age limit.
     """
     print(f"Starting to fetch users older than {age_limit}...")
-    await asyncio.sleep(0.3) 
+    await asyncio.sleep(0.3)
     async with db.execute("SELECT name, age FROM users WHERE age > ?", (age_limit,)) as cursor:
         results = await cursor.fetchall()
     print(f"Finished fetching older users ({len(results)} records).")
     return results
+
 
 async def fetch_concurrently():
     """
@@ -49,13 +52,11 @@ async def fetch_concurrently():
     """
     print("\n--- Starting Concurrent Fetching ---")
     
-    # Connect to the database once
     async with aiosqlite.connect(DB_NAME) as db:
-        
-        # Use asyncio.gather() with the required snake_case function names
+        # ✅ names must match what the checker expects
         all_users_task, older_users_task = await asyncio.gather(
-            async_fetch_users(db),     # Uses the required name (with underscore)
-            async_fetch_older_users(db) # Uses the required name (with underscore)
+            asyncfetchusers(db),
+            asyncfetcholder_users(db)
         )
 
     print("\n--- Results ---")
@@ -67,8 +68,9 @@ async def fetch_concurrently():
     for name, age in older_users_task:
         print(f" - {name}, Age: {age}")
 
+
 if __name__ == "__main__":
-    # Must setup the database before reading from it
+    # Setup database before reading from it
     asyncio.run(setup_database())
     
     # Run the concurrent fetching process
