@@ -18,9 +18,7 @@ async def setup_database():
         await db.commit()
         print("Database setup complete.")
 
-
-# ✅ EXACT names the checker expects
-async def async_fetch_users(db):
+async def asyncfetchusers(db):
     """
     Fetches all users from the database.
     """
@@ -53,7 +51,7 @@ async def fetch_concurrently():
     async with aiosqlite.connect(DB_NAME) as db:
         # ✅ Call the correct snake_case functions
         all_users_task, older_users_task = await asyncio.gather(
-            async_fetch_users(db),
+            asyncfetchusers(db),
             asyncfetcholder_users(db)
         )
 
