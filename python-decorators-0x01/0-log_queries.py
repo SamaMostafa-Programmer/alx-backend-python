@@ -1,5 +1,8 @@
 import sqlite3
 import functools
+from datetime import datetime # تمت الإضافة هنا بناءً على الملاحظة
+
+#### decorator to log SQL queries
 
 def log_queries(func):
     """
@@ -7,40 +10,31 @@ def log_queries(func):
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        # البحث عن حجة الاستعلام (query) في *args أو **kwargs
-        # نفترض هنا أن الاستعلام هو أول حجة موضعية أو يتم تمريره كحجة query=...
-        query = None
-        
-        # إذا كانت الدالة تستقبل الاستعلام كأول حجة موضعية
-        if args:
-            query = args[0]
-        
-        # إذا كانت الدالة تستقبل الاستعلام كحجة keyword باسم 'query'
-        if not query and 'query' in kwargs:
-            query = kwargs['query']
+        # محاولة استخلاص الاستعلام
+        query = args[0] if args and isinstance(args[0], str) else kwargs.get('query')
 
         if query:
-            print(f"LOG: Executing SQL query -> {query}")
-        else:
-            print("LOG: Executing function without explicit query argument.")
-
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(f"[{timestamp}] LOG: Executing SQL query -> {query}")
+        
         return func(*args, **kwargs)
 
     return wrapper
 
 @log_queries
 def fetch_all_users(query):
-    # إنشاء قاعدة بيانات وهمية إذا لم تكن موجودة للتجربة
+    # إعداد قاعدة بيانات للتجربة
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, email TEXT)")
     conn.commit()
     
+    # تنفيذ الاستعلام
     cursor.execute(query)
     results = cursor.fetchall()
     conn.close()
     return results
 
-# #### fetch users while logging the query
-# users = fetch_all_users(query="SELECT * FROM users")
-# print(users)
+#### fetch users while logging the query
+users = fetch_all_users(query="SELECT * FROM users")
+print("Fetched users count:", len(users))
