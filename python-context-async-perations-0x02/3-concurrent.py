@@ -1,6 +1,5 @@
 import asyncio
 import aiosqlite
-import time
 
 DB_NAME = 'async_app_database.db'
 
@@ -20,12 +19,12 @@ async def setup_database():
         print("Database setup complete.")
 
 
-# ✅ function name exactly as checker expects
-async def asyncfetchusers(db):
+# ✅ EXACT names the checker expects
+async def async_fetch_users(db):
     """
     Fetches all users from the database.
     """
-    print(f"Starting to fetch ALL users...")
+    print("Starting to fetch ALL users...")
     await asyncio.sleep(0.5)
     async with db.execute("SELECT name, age FROM users") as cursor:
         results = await cursor.fetchall()
@@ -33,8 +32,7 @@ async def asyncfetchusers(db):
     return results
 
 
-# ✅ function name exactly as checker expects
-async def asyncfetcholder_users(db, age_limit=40):
+async def async_fetch_older_users(db, age_limit=40):
     """
     Fetches users older than the specified age limit.
     """
@@ -53,10 +51,10 @@ async def fetch_concurrently():
     print("\n--- Starting Concurrent Fetching ---")
     
     async with aiosqlite.connect(DB_NAME) as db:
-        # ✅ names must match what the checker expects
+        # ✅ Call the correct snake_case functions
         all_users_task, older_users_task = await asyncio.gather(
-            asyncfetchusers(db),
-            asyncfetcholder_users(db)
+            async_fetch_users(db),
+            async_fetch_older_users(db)
         )
 
     print("\n--- Results ---")
@@ -70,8 +68,5 @@ async def fetch_concurrently():
 
 
 if __name__ == "__main__":
-    # Setup database before reading from it
     asyncio.run(setup_database())
-    
-    # Run the concurrent fetching process
     asyncio.run(fetch_concurrently())
