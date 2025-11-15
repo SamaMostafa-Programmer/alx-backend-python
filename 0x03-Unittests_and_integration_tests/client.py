@@ -2,7 +2,7 @@
 """Client for Github API"""
 
 from typing import List, Dict, Any
-from utils_mock import get_json
+from utils_mock import get_json  # utils_mock.py لازم يكون موجود في نفس الفولدر
 
 class GithubOrgClient:
     """Github organization client"""
