@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Unit tests for utils.py"""
 from unittest import TestCase
 from unittest.mock import Mock , patch
 from memoize import memoize
@@ -10,30 +11,35 @@ import unittest
 
 #Task 0 , 1
 class TestAccessNestedMap(unittest.TestCase):
+    """Tests for access_nested_map"""
     @parameterized.expand([
         ({"a": 1} ,  ("a",) , 1),
         ({"a": {"b": 2}} , ("a",) , {"b": 2}),
         ({"a": {"b": 2}} , ("a","b") , 2 ),
     ])
     def test_access_nested_map(self , nested_map , path , expected):
+         """Test correct dictionary navigation"""
         self.assertEqual(access_nested_map(nested_map , path) , expected)
     @parameterized.expand([
         ({} , ("a",)),
         ({"a": 1} , ("a","b")),
     ])
     def test_access_nested_map_exception(self , nested_map , path):
+        """Test KeyError is raised with correct message"""
         with self.assertRaises(KeyError) as cm:
             access_nested_map(nested_map , path)
         self.assertEqual(str(cm.exception), f"'{path[-1]}'")
 
 #Task 2
 class TestGetJson(TestCase):
+    """Tests for get_json function"""
     @parameterized.expand([
         ("http://example.com", {"payload": True}),
         ("http://holberton.io", {"payload": False}),
     ])
     @patch('mocking.requests.get')
     def test_get_json(self, test_url, test_payload, mock_get):
+        """Test get_json returns expected payload"""
         # Create a Mock response object with json() method
         mock_response = Mock()
         mock_response.json.return_value = test_payload
@@ -47,7 +53,9 @@ class TestGetJson(TestCase):
 
 #Task 3
 class TestMemoize(TestCase):
+    """Tests for memoize decorator"""
     def test_memoize(self):
+        """Ensure a_method is called once"""
         class TestClass:
             def a_method(self):
                 return 42
