@@ -80,7 +80,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Start patching requests.get at class level"""
+        """Patch requests.get at class level"""
         cls.get_patcher = patch("client.requests.get")
         cls.mock_get = cls.get_patcher.start()
 
@@ -97,8 +97,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """Stop patching"""
         cls.get_patcher.stop()
-
+        
 if __name__ == "__main__":
     unittest.main(module=None, argv=['first-arg-is-ignored'], exit=False)
