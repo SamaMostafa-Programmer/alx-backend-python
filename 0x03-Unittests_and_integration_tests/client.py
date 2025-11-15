@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Client for Github API"""
 
-import requests
 from typing import List, Dict, Any
-from mocking import get_json  # import from mocking.py عشان الـ patch يشتغل
-
+from utils_mock import get_json
 
 class GithubOrgClient:
     """Github organization client"""

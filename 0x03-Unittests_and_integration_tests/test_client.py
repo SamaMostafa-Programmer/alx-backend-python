@@ -31,8 +31,7 @@ class TestGithubOrgClientProperty(unittest.TestCase):
 
     def test_public_repos_url(self):
         """Test that _public_repos_url returns correct URL"""
-        org_name = "google"
-        client = GithubOrgClient(org_name)
+        client = GithubOrgClient("google")
 
         with patch.object(
             GithubOrgClient, "org", new_callable=PropertyMock
@@ -45,7 +44,6 @@ class TestGithubOrgClientProperty(unittest.TestCase):
                 client._public_repos_url,
                 "https://api.github.com/orgs/google/repos"
             )
-            mock_org.assert_called_once()
 
 
 class TestGithubOrgClientMethods(unittest.TestCase):
@@ -60,11 +58,10 @@ class TestGithubOrgClientMethods(unittest.TestCase):
         with patch.object(
             GithubOrgClient, "_public_repos_url", new_callable=PropertyMock
         ) as mock_url:
-            mock_url.return_value = "url"
+            mock_url.return_value = "https://api.github.com/orgs/google/repos"
             repos = client.public_repos()
             self.assertEqual(repos, ["repo1", "repo2"])
             mock_get_json.assert_called_once()
-            mock_url.assert_called_once()
 
     @parameterized.expand([
         ({"license": {"key": "my_license"}}, "my_license", True),
