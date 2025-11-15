@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-"""Unit tests for utils.py"""
-from unittest import TestCase
-from unittest.mock import Mock , patch
-from memoize import memoize
-from mocking import get_json
-from access_nested_map import access_nested_map
-from parameterized import parameterized
-from contextlib import contextmanager
+"""Unit tests for utils.py
+This module contains tests for:
+- access_nested_map
+- get_json
+- memoize decorator
+"""
+
 import unittest
+from unittest.mock import Mock, patch
+from parameterized import parameterized
+
+from access_nested_map import access_nested_map
+from mocking import get_json
+from memoize import memoize
+
 
 class TestAccessNestedMap(unittest.TestCase):
     """Tests for access_nested_map"""
@@ -57,6 +63,7 @@ class TestMemoize(unittest.TestCase):
 
     def test_memoize(self):
         """Test that a_method is only called once"""
+
         class TestClass:
             def a_method(self):
                 return 42
