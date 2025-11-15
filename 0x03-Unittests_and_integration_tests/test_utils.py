@@ -39,8 +39,7 @@ class TestAccessNestedMap(unittest.TestCase):
             str(cm.exception),
             f"'{path[-1]}'"
         )
-
-
+        
 
 class TestGetJson(unittest.TestCase):
     """Tests for get_json"""
