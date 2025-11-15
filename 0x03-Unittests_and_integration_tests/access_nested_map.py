@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+"""Module to access nested dictionaries using tuple paths."""
 def access_nested_map(nested_map : dict , path : tuple) -> int :
     """Access a nested map using a tuple path and return the value.
 
