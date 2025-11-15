@@ -39,8 +39,6 @@ class TestAccessNestedMap(unittest.TestCase):
             str(cm.exception),
             f"'{path[-1]}'"
         )
-        
-
 class TestGetJson(unittest.TestCase):
     """Tests for get_json"""
 
@@ -59,8 +57,6 @@ class TestGetJson(unittest.TestCase):
 
         mock_get.assert_called_once_with(test_url)
         self.assertEqual(result, test_payload)
-
-
 class TestMemoize(unittest.TestCase):
     """Tests for memoize decorator"""
 
