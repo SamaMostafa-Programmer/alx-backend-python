@@ -70,7 +70,6 @@ class TestGithubOrgClientMethods(unittest.TestCase):
         client = GithubOrgClient("google")
         self.assertEqual(client.has_license(repo, license_key), expected)
 
-
 @parameterized_class([{
     "org_payload": org_payload,
     "repos_payload": repos_payload,
@@ -81,7 +80,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Patch requests.get at class level"""
+        """Start patching requests.get at class level"""
         cls.get_patcher = patch("client.requests.get")
         cls.mock_get = cls.get_patcher.start()
 
@@ -98,8 +97,8 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        """Stop patching"""
         cls.get_patcher.stop()
-
 
 if __name__ == "__main__":
     unittest.main(module=None, argv=['first-arg-is-ignored'], exit=False)
