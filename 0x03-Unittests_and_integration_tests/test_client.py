@@ -11,11 +11,11 @@ from fixtures import org_payload, repos_payload, expected_repos, apache2_repos
 
 class TestGithubOrgClient(unittest.TestCase):
 
+    @patch("client.get_json")  # path مطابق للـ import في client.py
     @parameterized.expand([
         ("google",),
         ("abc",),
     ])
-    @patch("client.get_json")  # path مطابق للـ import في client.py
     def test_org(self, org_name, mock_get_json):
         """Test that org returns correct value"""
         mock_get_json.return_value = {"login": org_name}
