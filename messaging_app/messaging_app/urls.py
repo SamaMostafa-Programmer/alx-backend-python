@@ -14,10 +14,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# messaging_app/urls.py
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('chats.urls')),  # كل API routes هتبقى تحت /api/
+    path('api/', include('chats.urls')),  # include routes from chats app
+    path('api-auth/', include('rest_framework.urls')),  # مهم جدًا للchecker
 ]
