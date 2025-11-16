@@ -1,12 +1,15 @@
 # chats/urls.py
 from django.urls import path, include
-from rest_framework import routers  # مهم: import routers هنا
+from rest_framework_nested import routers
 from .views import ConversationViewSet, MessageViewSet
 
-router = routers.DefaultRouter()  # لازم يكون DefaultRouter() من routers
+router = routers.DefaultRouter()
 router.register(r'conversations', ConversationViewSet, basename='conversation')
-router.register(r'messages', MessageViewSet, basename='message')
+
+messages_router = routers.NestedDefaultRouter(router, r'conversations', lookup='conversation')
+messages_router.register(r'messages', MessageViewSet, basename='conversation-messages')
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
+    path('', include(messages_router.urls)),
 ]
