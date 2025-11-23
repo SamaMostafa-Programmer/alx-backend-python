@@ -29,3 +29,12 @@ class IsParticipantOfConversation(permissions.BasePermission):
             return user in obj.conversation.participants.all()
 
         return False
+from rest_framework.permissions import BasePermission
+
+class IsParticipant(BasePermission):
+    """
+    Allows access only to participants in the conversation.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return request.user in obj.participants.all()
