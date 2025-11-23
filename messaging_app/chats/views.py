@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from django_filters.rest_framework import DjangoFilterBackend
+from .permissions import IsParticipantOfConversation
+
+permission_classes = [IsParticipantOfConversation]
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
