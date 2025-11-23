@@ -23,3 +23,16 @@ urlpatterns = [
     path('api/', include('chats.urls')),  # include routes from chats app
     path('api-auth/', include('rest_framework.urls')),  # مهم جدًا للchecker
 ]
+# messaging_app/urls.py (or project-level urls.py)
+from django.urls import path, include
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns = [
+    # ... your other urls
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api-auth/', include('rest_framework.urls')),  # optional: browsable login
+]
