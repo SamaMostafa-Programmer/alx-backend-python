@@ -61,11 +61,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     # Pagination & filtering defaults (you can override per-view)
-    'DEFAULT_PAGINATION_CLASS': 'chats.pagination.TwentyPerPagePagination',
-    'PAGE_SIZE': 20,
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",  # REQUIRED
+    "PAGE_SIZE": 20,
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend"
+    ]
 }
 
 REST_FRAMEWORK = {
