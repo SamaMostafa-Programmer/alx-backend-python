@@ -10,6 +10,7 @@ class RequestLoggingMiddleware:
             f.write(f"{datetime.now()} - User: {user} - Path: {request.path}\n")
         response = self.get_response(request)
         return response
+
 from datetime import datetime
 from django.http import HttpResponseForbidden
 
@@ -18,14 +19,15 @@ class RestrictAccessByTimeMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        now = datetime.now().hour
-        # يسمح بالدخول بين 6PM (18) و 9PM (21)
-        if not (18 <= now <= 21):
-            return HttpResponseForbidden("Chat access is restricted between 9PM and 6PM")
+        # جلب الساعة الحالية
+        current_hour = datetime.now().hour
+
+        # منع الوصول خارج 18:00 إلى 21:00
+        if current_hour < 18 or current_hour > 21:
+            return HttpResponseForbidden("Chat access is restricted between 6PM and 9PM.")
+
         response = self.get_response(request)
         return response
-from django.http import HttpResponseForbidden
-import time
 
 class OffensiveLanguageMiddleware:
     def __init__(self, get_response):
