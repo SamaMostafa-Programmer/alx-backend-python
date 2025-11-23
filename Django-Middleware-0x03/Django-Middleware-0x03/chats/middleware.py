@@ -68,5 +68,3 @@ class RolepermissionMiddleware:
             return HttpResponseForbidden("You do not have permission to access this resource.")
         response = self.get_response(request)
         return response
-        response = self.get_response(request)
-        return response
