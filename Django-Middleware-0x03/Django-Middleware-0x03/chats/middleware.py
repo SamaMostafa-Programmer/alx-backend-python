@@ -9,20 +9,20 @@ logging.basicConfig(filename='requests.log', level=logging.INFO)
 
 
 class RequestLoggingMiddleware:
-    def _init_(self, get_response):
+    def __init__(self, get_response):
         self.get_response = get_response
 
-    def _call_(self, request):
+    def __call__(self, request):
         user = request.user if request.user.is_authenticated else "Anonymous"
         logging.info(f"{datetime.now()} - User: {user} - Path: {request.path}")
         return self.get_response(request)
 
 
 class RestrictAccessByTimeMiddleware:
-    def _init_(self, get_response):
+    def __init__(self, get_response):
         self.get_response = get_response
 
-    def _call_(self, request):
+    def __call__(self, request):
         hour = datetime.now().hour
         if not (18 <= hour <= 21):  # Access allowed only between 6PM and 9PM
             return HttpResponseForbidden("Chat allowed only between 6PM and 9PM")
@@ -30,11 +30,11 @@ class RestrictAccessByTimeMiddleware:
 
 
 class OffensiveLanguageMiddleware:
-    def _init_(self, get_response):
+    def __init__(self, get_response):
         self.get_response = get_response
         self.ip_data = defaultdict(list)  # Track requests per IP
 
-    def _call_(self, request):
+    def __call__(self, request):
         if request.method == "POST":
             ip = request.META.get("REMOTE_ADDR")
             now = time.time()
@@ -50,10 +50,10 @@ class OffensiveLanguageMiddleware:
 
 
 class RolepermissionMiddleware:
-    def _init_(self, get_response):
+    def __init__(self, get_response):
         self.get_response = get_response
 
-    def _call_(self, request):
+    def __call__(self, request):
         if request.user.is_authenticated:
             role = getattr(request.user, "role", "user")
             if role not in ["admin", "moderator"]:
