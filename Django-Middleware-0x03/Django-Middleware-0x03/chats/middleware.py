@@ -56,8 +56,9 @@ class OffensiveLanguageMiddleware:
             ip = request.META.get('REMOTE_ADDR')
         return ip
         
-# 4. Enforce Role Permissions
-class RolepermissionMiddleware :
+from django.http import HttpResponseForbidden
+
+class RolepermissionMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -65,5 +66,7 @@ class RolepermissionMiddleware :
         user = getattr(request, 'user', None)
         if not (user and user.is_authenticated and user.role in ['admin', 'moderator']):
             return HttpResponseForbidden("You do not have permission to access this resource.")
+        response = self.get_response(request)
+        return response
         response = self.get_response(request)
         return response
