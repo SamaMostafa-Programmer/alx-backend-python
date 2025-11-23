@@ -55,17 +55,20 @@ class OffensiveLanguageMiddleware:
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+        
 from django.http import HttpResponseForbidden
-
-class RolePermissionMiddleware:
+class RolepermissionMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        # افترض أن الوصول لبعض المسارات خاص بالمشرفين فقط
-        admin_paths = ["/api/admin-only"]
-        if request.path in admin_paths:
-            if not request.user.is_authenticated or request.user.role not in ['admin', 'moderator']:
-                return HttpResponseForbidden("You do not have permission to access this resource.")
+        # التأكد أن المستخدم مسجل دخول
+        user = getattr(request, 'user', None)
+
+        # السماح فقط للـ admin أو moderator
+        if not (user and user.is_authenticated and user.role in ['admin', 'moderator']):
+            return HttpResponseForbidden("You do not have permission to access this resource.")
+
         response = self.get_response(request)
         return response
+
