@@ -1,64 +1,130 @@
 from datetime import datetime
+import logging
+
 from django.http import HttpResponseForbidden
-import time
+
+class RolepermissionMiddleware:
+    """
+    Middleware that allows only users with role 'admin' or 'moderator'
+    to access specific chat actions.
+    """
+
+    ALLOWED_ROLES = ['admin', 'moderator']
+
+    def _init_(self, get_response):
+        self.get_response = get_response
+
+    def _call_(self, request):
+        # Skip check if user is anonymous
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden("You must be logged in.")
+
+        # Assume user has a 'role' attribute (admin, moderator, user)
+        user_role = getattr(request.user, 'role', 'user')
+
+        if user_role not in self.ALLOWED_ROLES:
+            return HttpResponseForbidden("You do not have permission to perform this action.")
+
+        return self.get_response(request)
 
 class RequestLoggingMiddleware:
-    def __init__(self, get_response):
+    """
+    Middleware that logs every request with timestamp, user, and request path.
+    """
+
+    def _init_(self, get_response):
         self.get_response = get_response
 
-    def __call__(self, request):
+        # Configure logger (writes to requests.log)
+        logging.basicConfig(
+            filename='requests.log',
+            level=logging.INFO,
+            format='%(message)s'
+        )
+        self.logger = logging.getLogger(_name_)
+
+    def _call_(self, request):
         user = request.user if request.user.is_authenticated else "Anonymous"
-        with open("requests.log", "a") as f:
-            f.write(f"{datetime.now()} - User: {user} - Path: {request.path}\n")
+
+        # Log the request
+        log_message = f"{datetime.now()} - User: {user} - Path: {request.path}"
+        self.logger.info(log_message)
+
+        # Continue the request
         response = self.get_response(request)
         return response
+
+from datetime import datetime
+from django.http import HttpResponseForbidden
 
 class RestrictAccessByTimeMiddleware:
-    def __init__(self, get_response):
+    """
+    Blocks access to the chat outside allowed hours (6 PM – 9 PM)
+    """
+
+    def _init_(self, get_response):
         self.get_response = get_response
 
-    def __call__(self, request):
-        now = datetime.now().hour
-        if not (18 <= now <= 21):
-            return HttpResponseForbidden("Chat access is restricted between 9PM and 6PM")
-        response = self.get_response(request)
-        return response
+    def _call_(self, request):
+        now = datetime.now().time()
+
+        # Allowed hours: 6 PM (18:00) to 9 PM (21:00)
+        from datetime import time
+        start_time = time(18, 0)   # 6 PM
+        end_time = time(21, 0)     # 9 PM
+
+        if not (start_time <= now <= end_time):
+            return HttpResponseForbidden("Access to chat is restricted at this time.")
+
+        return self.get_response(request)
+
+from django.http import HttpResponseForbidden
+from datetime import datetime, timedelta
 
 class OffensiveLanguageMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-        self.ip_requests = {}
+    """
+    Middleware that limits the number of chat messages a user can send
+    per IP address within a time window (e.g., 5 messages per minute).
+    """
 
-    def __call__(self, request):
-        if request.method == "POST" and request.path.startswith("/api/conversations"):
+    # Class-level dictionary to track IP addresses and timestamps
+    ip_message_tracker = {}
+
+    MAX_MESSAGES = 5
+    TIME_WINDOW = timedelta(minutes=1)
+
+    def _init_(self, get_response):
+        self.get_response = get_response
+
+    def _call_(self, request):
+        # Only track POST requests (sending messages)
+        if request.method == "POST" and request.path.startswith("/chats/messages/"):
             ip = self.get_client_ip(request)
-            now = time.time()
-            timestamps = self.ip_requests.get(ip, [])
-            timestamps = [t for t in timestamps if now - t < 60]
-            if len(timestamps) >= 5:
-                return HttpResponseForbidden("Too many messages sent. Try again later.")
-            timestamps.append(now)
-            self.ip_requests[ip] = timestamps
-        response = self.get_response(request)
-        return response
+            now = datetime.now()
+
+            # Initialize tracker for this IP
+            if ip not in self.ip_message_tracker:
+                self.ip_message_tracker[ip] = []
+
+            # Remove timestamps older than TIME_WINDOW
+            self.ip_message_tracker[ip] = [
+                t for t in self.ip_message_tracker[ip] if now - t < self.TIME_WINDOW
+            ]
+
+            if len(self.ip_message_tracker[ip]) >= self.MAX_MESSAGES:
+                return HttpResponseForbidden("Message limit exceeded. Try again later.")
+
+            # Record current message timestamp
+            self.ip_message_tracker[ip].append(now)
+
+        return self.get_response(request)
 
     def get_client_ip(self, request):
+        # Get IP address from request headers
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0]
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
-
-class RolePermissionMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        admin_paths = ["/api/admin-only"]
-        if request.path in admin_paths:
-            if not request.user.is_authenticated or request.user.role not in ['admin', 'moderator']:
-                return HttpResponseForbidden("You do not have permission to access this resource.")
-        response = self.get_response(request)
-        return response
 
