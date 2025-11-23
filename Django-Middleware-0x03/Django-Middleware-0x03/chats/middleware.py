@@ -57,7 +57,7 @@ class OffensiveLanguageMiddleware:
         return ip
         
 # 4. Enforce Role Permissions
-class RolepermissionMiddleware:
+class RolepermissionMiddleware :
     def __init__(self, get_response):
         self.get_response = get_response
 
