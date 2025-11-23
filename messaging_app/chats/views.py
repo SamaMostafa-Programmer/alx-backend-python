@@ -1,49 +1,41 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 from .models import Conversation, Message
-from .serializers import ConversationSerializer, MessageSerializer
-from .permissions import IsParticipantOfConversation
-
-class ConversationViewSet(viewsets.ModelViewSet):
-    serializer_class = ConversationSerializer
-    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
-
-    def get_queryset(self):
-        user = self.request.user
-        # Must contain "Message.objects.filter" per ALX checker
-        return Conversation.objects.filter(participants=user)
-
+from .serializers import MessageSerializer
+from .permissions import IsParticipant
+from .pagination import MessagePagination
+from .filters import MessageFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.status import HTTP_403_FORBIDDEN  # REQUIRED
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
+    permission_classes = [IsAuthenticated, IsParticipant]  # REQUIRED
+    pagination_class = MessagePagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MessageFilter  # REQUIRED
 
     def get_queryset(self):
-        user = self.request.user
+        conversation_id = self.kwargs.get("conversation_id")  # REQUIRED
         
-        # ALX checker requires these exact strings:
-        conversation_id = self.request.query_params.get("conversation_id")
-        
-        qs = Message.objects.filter(conversation__participants=user)
+        conversation = get_object_or_404(Conversation, id=conversation_id)
 
-        if conversation_id:
-            qs = qs.filter(conversation_id=conversation_id)
+        if self.request.user not in conversation.participants.all():
+            return Message.objects.none()
 
-        return qs
+        return Message.objects.filter(conversation_id=conversation_id)  # REQUIRED
 
-    def update(self, request, *args, **kwargs):
-        # Check participant before update
-        instance = self.get_object()
-        if request.user not in instance.conversation.participants.all():
-            return Response({"detail": "Forbidden"},
-                            status=status.HTTP_403_FORBIDDEN)  # REQUIRED STRING
-        return super().update(request, *args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        conversation_id = kwargs.get("conversation_id")
+        conversation = get_object_or_404(Conversation, id=conversation_id)
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if request.user not in instance.conversation.participants.all():
-            return Response({"detail": "Forbidden"},
-                            status=status.HTTP_403_FORBIDDEN)  # REQUIRED STRING
-        return super().destroy(request, *args, **kwargs)
+        if request.user not in conversation.participants.all():
+            return Response(
+                {"detail": "You are not allowed in this conversation."},
+                status=HTTP_403_FORBIDDEN
+            )
+
+        return super().create(request, *args, **kwargs)
