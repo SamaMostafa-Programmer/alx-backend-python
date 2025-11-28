@@ -54,3 +54,11 @@ read = models.BooleanField(default=False)
 
 objects = models.Manager()
 unread = UnreadMessagesManager()
+
+edited_by = models.ForeignKey(
+    'auth.User',
+    null=True,
+    blank=True,
+    related_name="edited_messages",
+    on_delete=models.SET_NULL
+)

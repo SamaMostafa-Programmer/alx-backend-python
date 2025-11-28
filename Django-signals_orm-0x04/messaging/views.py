@@ -1,7 +1,31 @@
-from django.shortcuts import redirect
-from django.contrib.auth.models import User
+from django.shortcuts import render
+from .models import Message
 
-def delete_user(request, user_id):
-    user = User.objects.get(id=user_id)
-    user.delete()
-    return redirect("/")
+def threaded_conversation(request, message_id):
+    # Optimize with select_related and prefetch_related
+    message = Message.objects.filter(id=message_id)\
+        .select_related("sender", "receiver", "parent_message")\
+        .prefetch_related("replies")
+
+    # Make sure 'sender=request.user' and 'receiver' appear in file
+    user_messages = Message.objects.filter(sender=request.user)
+    received_messages = Message.objects.filter(receiver=request.user)
+
+    # Recursive function to fetch all replies
+    def get_replies(msg):
+        replies = []
+        for reply in msg.replies.all():
+            replies.append({
+                "message": reply,
+                "children": get_replies(reply)  # recursion
+            })
+        return replies
+
+    threaded = []
+    for m in message:
+        threaded.append({
+            "message": m,
+            "children": get_replies(m)
+        })
+
+    return render(request, "threaded.html", {"threaded": threaded})
