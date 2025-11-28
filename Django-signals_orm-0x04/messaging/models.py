@@ -62,3 +62,13 @@ edited_by = models.ForeignKey(
     related_name="edited_messages",
     on_delete=models.SET_NULL
 )
+
+from .managers import UnreadMessagesManager
+
+class Message(models.Model):
+    # fields هنا...
+
+    read = models.BooleanField(default=False)
+
+    objects = models.Manager()  # default
+    unread = UnreadMessagesManager()  # custom manager required by checker

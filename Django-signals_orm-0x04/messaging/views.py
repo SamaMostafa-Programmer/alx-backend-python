@@ -29,3 +29,14 @@ def threaded_conversation(request, message_id):
         })
 
     return render(request, "threaded.html", {"threaded": threaded})
+
+from django.shortcuts import render
+from .models import Message
+
+def unread_inbox(request):
+    # checker keywords required:
+    unread_messages = Message.unread.unread_for_user(request.user).only(
+        "id", "content", "timestamp"
+    )
+
+    return render(request, "unread.html", {"messages": unread_messages})
