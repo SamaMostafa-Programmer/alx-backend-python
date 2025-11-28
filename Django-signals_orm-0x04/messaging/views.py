@@ -42,6 +42,19 @@ def unread_inbox(request):
     return render(request, "unread.html", {"messages": unread_messages})
 
 # chats/views.py
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_user(request):
+    user = request.user
+    user.delete()  # حذف حساب المستخدم
+    return Response({"detail": "User deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+# chats/views.py
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from rest_framework import viewsets
