@@ -1,28 +1,35 @@
-version: '3'
+version: '3.9'
 
 services:
   db:
     image: mysql:8.0
+    container_name: mysql_db
     restart: always
     environment:
-      MYSQL_DATABASE: ${MYSQL_DB}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: messaging_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
+    container_name: django_web
+    command: python3 manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
+    environment:
+      - MYSQL_DATABASE=messaging_db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_HOST=db
     depends_on:
       - db
+    volumes:
+      - .:/app
 
 volumes:
-  mysql_data:
+  db_data:
