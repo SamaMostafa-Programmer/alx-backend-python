@@ -6,7 +6,7 @@ services:
     container_name: mysql_db
     restart: always
     environment:
-      MYSQL_DATABASE: messaging_db
+      MYSQL_DB: messaging_db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -22,10 +22,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MYSQL_DATABASE=messaging_db
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - MYSQL_HOST=db
+      MYSQL_DB: messaging_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: db
     depends_on:
       - db
     volumes:
