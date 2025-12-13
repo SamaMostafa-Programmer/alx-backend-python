@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Apply updated deployment
+kubectl apply -f blue_deployment.yaml
+
+# Rollout status
+kubectl rollout status deployment/django-messaging-blue
+
+# Test downtime
+while true; do curl -s http://<minikube-ip>:<nodeport>/; sleep 1; done
