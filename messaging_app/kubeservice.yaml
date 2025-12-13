@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: messaging-service
+spec:
+  selector:
+    app: django-messaging-blue  # switch to green later
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
