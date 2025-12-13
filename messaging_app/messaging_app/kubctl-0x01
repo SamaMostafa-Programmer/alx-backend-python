@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Scale deployment
+kubectl scale deployment django-messaging --replicas=3
+
+# Verify
+kubectl get pods
+
+# Monitor resource usage
+kubectl top pods
+
+# Optional: load test (if wrk installed)
+# wrk -t2 -c10 -d10s http://<minikube-ip>:<nodeport>
